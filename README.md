@@ -33,4 +33,4 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 **_n_bins_**: a positive integer for the total number of bins for each discretization. The default value is 10
 
-**_disc_backup_**: a string indicating the discretization method adopted if the method $\texttt{disc_method="mdlp"}$ fails. The default string is "pkid"
+**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails. The default string is "pkid"
