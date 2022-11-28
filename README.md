@@ -4,7 +4,8 @@ Paper: A New Simple Effective InsurTech Tool: Comonotone-Independence Bayes clas
 Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, James Cheng PENG, and Sheung Chi Phillip YAM
 
 This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The continuous feature variables are discretized and those categorical ones are encoded via the proposed **Joint Encoding**. 
-This document mainly explain the important and practical functions in **CIBer.py** and **CIBer_Engineering.py**.
+
+This document mainly explain the important and practical functions in **CIBer.py** and **CIBer_Engineering.py**. Lastly, the **CIBer_Bankchurner.py** gives a simple but illuminating example on CIBer with the use of [Bankchurner](https://www.kaggle.com/code/thomaskonstantin/bank-churn-data-exploration-and-churn-prediction/data) dataset by Thomas Konstantin.
 
 # Remarks
 The **MDLP** discretization method has been disabled, since it requires additional package.
