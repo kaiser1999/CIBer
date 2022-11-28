@@ -3,7 +3,8 @@
 Paper: A New Simple Effective InsurTech Tool: Comonotone-Independence Bayes classifier (CIBer)
 Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, James Cheng PENG, and Sheung Chi Phillip YAM
 
-This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The document consists of two parts: the requirements for the input data and the input parameters in CIBer.py.
+This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The continuous feature variables are discretized and those categorical ones are encoded via the proposed **Joint Encoding**. 
+This document mainly explain the important and practical functions in **CIBer.py** and **CIBer_Engineering.py**.
 
 # Remarks
 The **MDLP** discretization method has been disabled, since it requires additional package.
@@ -13,8 +14,7 @@ The **MDLP** discretization method has been disabled, since it requires addition
 
 # Data Requirements
 
-CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please make sure to do some proper preprocessing beforehand, e.g. removals of outlier and missing observation. If your dataset contains categorical data like gender, nationality, occupation, which are not ordered, please refer to the class **_Joint_Encoding_** in the CIBer_Engineering.py. 
-
+CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please perform some proper data preprocessing beforehand, e.g. removals of outlier and missing observation, and encode all categorical feature variables with numerical values.
 
 # CIBer.py
 
