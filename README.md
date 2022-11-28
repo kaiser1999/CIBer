@@ -5,6 +5,11 @@ Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, James Cheng PENG, and Sheun
 
 This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The document consists of two parts: the requirements for the input data and the input parameters in CIBer.py.
 
+# Remarks
+The **MDLP** discretization method has been disabled, since it requires additional package.
+1. install visual studio community, and then install C related packages for Cpython
+2. type the following line in terminal to install
+> pip install mdlp-discretization
 
 # Data Requirements
 
