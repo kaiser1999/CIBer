@@ -3,21 +3,19 @@
 Paper: A New Simple Effective InsurTech Tool: Comonotone-Independence Bayes classifier (CIBer)
 Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, James Cheng PENG, and Sheung Chi Phillip YAM
 
-# User Guide for CIBer
-
 This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The document consists of two parts: the requirements for the input data and the input parameters in CIBer.py.
 
 
-## Data Requirements
+# Data Requirements
 
 CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please make sure to do some proper preprocessing beforehand, e.g. removals of outlier and missing observation. If your dataset contains categorical data like gender, nationality, occupation, which are not ordered, please refer to the class **_Joint_Encoding_** in the CIBer_Engineering.py. 
 
 
-## CIBer.py
+# CIBer.py
 
-### CIBer
+## CIBer
 
-#### init()
+### init()
 
 **_cont_col_**: a list, containing the indices of the continuous variables
 
@@ -37,27 +35,27 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 **_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails. The default string is "pkid"
 
-### fit()
+## fit()
 
 **_x_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
 
 **_y_train_**: a numpy $n \times 1$ array for the $n$ training (real-valued) labels
 
-### predict()
+## predict()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
 **return**: a numpy $n \times 1$ array for the $n$ predicted class labels
 
-### predict_proba()
+## predict_proba()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
 **return**: a numpy $n \times K$ array for the predicted probabilities of the $K$ classes with $n$ test observations
 
-## CIBer_Engineering.py
+# CIBer_Engineering.py
 
-### Discretization()
+## Discretization()
 
 **_cont_col_**: a list of indices to be discretized
 
@@ -77,19 +75,19 @@ list of alternative methods if mdlp fails
 
 **return** a class for discretization method
 
-### Joint_Encoding
+## Joint_Encoding
 
-#### init()
+### init()
 
 **_df_**: a $n \times p$ dataframe for $p$ feature variables of $n$ observations
 
 **_col_index_**: a list, containing the indices of categorical feature variables
 
-#### fit()
+### fit()
 
 **_x_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
 
-#### transform()
+### transform()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
