@@ -7,7 +7,7 @@ This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). 
 
 # Remarks
 The **MDLP** discretization method has been disabled, since it requires additional package.
-1. install visual studio community, and then install C related packages for Cpython
+1. install visual studio community, and then install C related packages for CPython
 2. type the following line in terminal to install
 > pip install mdlp-discretization
 
@@ -72,10 +72,10 @@ list of distributions provided by scipy used in Equal-quantile distribution meth
 list of common discretiztion methods for Na\"ive Bayes classifier
 > SIZE_BASE = ["equal_size", "pkid", "ndd", "wpkid"]
 
-
+list of all discretization methods except **SCIPY_DIST**
 > DISC_BASE = ["equal_length", "auto"] + SIZE_BASE
 
-list of alternative methods if mdlp fails
+list of alternative discretization methods if mdlp fails except **SCIPY_DIST**
 > MDLP_BACKUP = ["equal_length", "auto"] + SIZE_BASE
 
 **return** a class for discretization method
