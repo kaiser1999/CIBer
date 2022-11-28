@@ -10,7 +10,7 @@ This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). 
 
 ## Data Requirements
 
-CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please make sure to do some proper preprocessing beforehand, e.g. removals of outlier and missing observation. If your dataset contains categorical data like gender, nationality, occupation, which are not ordered, please refer to the function $\textbf{joint_encode}$ in the CIBer_Engineering.py. 
+CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please make sure to do some proper preprocessing beforehand, e.g. removals of outlier and missing observation. If your dataset contains categorical data like gender, nationality, occupation, which are not ordered, please refer to the class $\texttt{Joint_Encoding}$ in the CIBer_Engineering.py. 
 
 
 ## CIBer.py
