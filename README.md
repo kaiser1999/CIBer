@@ -54,3 +54,43 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
 **return**: a numpy $n \times K$ array for the predicted probabilities of the $K$ classes with $n$ test observations
+
+## CIBer_Engineering.py
+
+### Discretization
+
+**_cont_col_**: a list of indices to be discretized
+
+**_disc_method_**: (refer to CIBer.py) 
+
+list of distributions provided by scipy used in Equal-quantile distribution method, number of bins determined by **_n_bins_**
+> SCIPY_DIST = ["uniform", "norm", "t", "chi2", "expon", "laplace", "skewnorm", "gamma"]
+
+list of common discretiztion methods for Na\"ive Bayes classifier
+> SIZE_BASE = ["equal_size", "pkid", "ndd", "wpkid"]
+
+
+> DISC_BASE = ["equal_length", "auto"] + SIZE_BASE
+
+list of alternative methods if mdlp fails
+> MDLP_BACKUP = ["equal_length", "auto"] + SIZE_BASE
+
+**return** a class for discretization method
+
+### Joint_Encoding
+
+#### init
+
+**_df_**: a $n \times p$ dataframe for $p$ feature variables of $n$ observations
+
+**_col_index_**: a list, containing the indices of categorical feature variables
+
+#### fit
+
+**_x_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
+
+#### transform
+
+**_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n \times p$ array with the encoded categorical feature variable
