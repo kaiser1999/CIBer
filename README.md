@@ -10,7 +10,7 @@ This document mainly explain the important and practical functions in **CIBer.py
 # Remarks
 The **MDLP** discretization method has been disabled, since it requires additional package.
 ## window users
-1. install visual studio community, and then install **Microsoft C++ Build Tools** for C/C++ related packages
+1. install visual studio community, and then install [**Microsoft C++ Build Tools**](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for C/C++ related packages
 2. type the following line in terminal to install
 > pip install mdlp-discretization
 
