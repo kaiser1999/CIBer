@@ -28,7 +28,8 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 ## CIBer
 
-> init()
+> init(self, cont_col=[], asso_method='total_order', min_asso=0.8, alpha=1, 
+                 group_cate=False, joint_encode=True, disc_method="auto", n_bins=10, disc_backup="pkid")
 
 **_cont_col_**: a list, containing the indices of the continuous variables
 
