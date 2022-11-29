@@ -29,6 +29,7 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 ## CIBer
 
 > init()
+
 **_cont_col_**: a list, containing the indices of the continuous variables
 
 **_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "total_order". Four measurements to correlation. The default is "total_order"
