@@ -2,35 +2,34 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
 import warnings
-from CIBer_Engineering import Discretization, Joint_Encoding, Frequency_Encoding, Group_Categorical
+from CIBer_Engineering import Discretization, Joint_Encoding, Frequency_Encoding
+import concurrent.futures
+import pickle
+copy_obj = lambda obj: pickle.loads(pickle.dumps(obj))
 
 class CIBer():
     def __init__(self, cont_col=[], asso_method='kendall', min_asso=0.8, alpha=1, 
-                 group_cate=False, joint_encode=True, disc_method="mdlp", n_bins=10, disc_backup="pkid"):
-        self.min_asso = min_asso
-        self.group_cate = group_cate
-        self.disc_method = disc_method.lower()
-        self.discretizer = Discretization(cont_col, disc_method, disc_backup, n_bins)
-        
-        self.grouping = Group_Categorical(cont_col)
+                 disc_method="mdlp", joint_encode=True, **kwargs):
         self.cont_col = cont_col
-        if joint_encode:
-            self.encode = Joint_Encoding()
-        else:
-            self.encode = Frequency_Encoding()
-        self.cluster_book = dict()
-        
-        assert asso_method.lower() in ["spearman", "pearson", "kendall", "total_order"]
         if asso_method.lower() == "total_order":
-            self.asso_method = self.total_order
+            self.asso_method = self._total_order
         else:
             self.asso_method = asso_method.lower()
-        
-        assert min_asso >= 0 and min_asso <= 1
+        self.min_asso = min_asso
         self.alpha = alpha
-        assert self.alpha > 0
+        self.disc_method = disc_method.lower()
+        self.discretizer = Discretization(cont_col, self.disc_method, **kwargs)
+        if joint_encode:
+            self.encoder = Joint_Encoding()
+        else:
+            self.encoder = Frequency_Encoding()
+
+        self.cluster_book = dict()
+        assert asso_method.lower() in ["spearman", "pearson", "kendall", "total_order"]
+        assert min_asso >= 0 and min_asso <= 1
+        assert alpha > 0
     
-    def total_order(self, a, b):
+    def _total_order(self, a, b):
         freq_df = pd.DataFrame({"a":a, "b":b}).groupby(['a','b']).size().reset_index(name='count')
         x, y, count = freq_df.T.values
         n = len(a)
@@ -54,146 +53,105 @@ class CIBer():
                 s += np.sum(arr)
             return s / (n*(n-1)/2)
         
-    def association(self, x_train, c):
+    def _get_association(self, x_train, c):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             asso_matrix = pd.DataFrame(data=x_train).corr(method=self.asso_method).to_numpy()
         
-        distance_matrix = 1 - np.absolute(asso_matrix)
-        distance_matrix = np.nan_to_num(distance_matrix, nan=1)
-        
+        distance_matrix = np.nan_to_num(1 - np.absolute(asso_matrix), nan=1)
         AGNES = AgglomerativeClustering(affinity='precomputed', linkage='complete', 
                                         distance_threshold=1-self.min_asso, n_clusters=None)
         AGNES.fit(distance_matrix)
-        self.cluster_book[c] = list()
-        for cluster in np.unique(AGNES.labels_):
-            self.cluster_book[c].append(np.where(AGNES.labels_ == cluster)[0].tolist())
-        
-        self.cluster_book[c] = sorted(self.cluster_book[c])
+        AGNES_clusters = AGNES.labels_
+        self.cluster_book[c] = sorted([np.where(AGNES_clusters == cluster)[0].tolist() for cluster in np.unique(AGNES_clusters)])
     
-    def get_prior_prob(self, y_train):
-        # get the prior probability and indices of instances for different classes
-        prior_prob = dict() # key is class, value is the prior probability of this class
-        class_idx = dict() # key is class, value is a list containing the indices of instances for this class
-        for value in np.unique(y_train):
-            class_idx[value] = np.squeeze(np.where(y_train == value)).tolist()
-        prior_prob = {k:len(v)/len(y_train) for k,v in class_idx.items()}
-        self.prior_prob = prior_prob
-        self.class_idx = class_idx
-    
-    def Laplacian_Correction(self, x_train, x_test, col, class_dict):
-        new_key = False
-        # Laplacian correction for training and testing dataset
-        for k in np.unique(list(x_train[:,col]) + list(x_test[:,col])):
-            if k not in class_dict.keys():
-                new_key = True
-                class_dict[k] = 0
-            
-        if new_key:
-            for key in class_dict.keys():
-                class_dict[key] += self.alpha
-        
-        # M-estimate
-        for key in class_dict.keys():
-            p = class_dict[key]/sum(class_dict.values())
-            class_dict[key] += self.alpha * p
-        return class_dict
-    
-    def get_cond_prob(self, x_train, x_test):
-        ncol = np.shape(x_train)[1]
-        
-        self.cond_prob = dict() # key is column, value dict: key is class, value is corresponding probabilities
-        self.cond_cum_prob = dict() # key is column, value dict: key is class, value is corresponding cumulative probabilities
-        for col in range(ncol):
-            feature_dict = dict()
-            cum_feature_dict = dict()
-            for c in self.class_idx.keys():
-                indices = self.class_idx[c]
-                values, counts = np.unique(x_train[indices, col], return_counts=True)
-                
-                class_dict = dict(zip(values, counts))
-                class_dict = self.Laplacian_Correction(x_train, x_test, col, class_dict)
-                    
-                summation = sum(class_dict.values())
-                cum_sum = np.cumsum(list(class_dict.values()))
-                
-                feature_dict[c] = {k:v/summation for k,v in class_dict.items()}
-                cum_feature_dict[c] = dict(zip(class_dict.keys(), cum_sum/summation))
-            self.cond_prob[col] = feature_dict
-            self.cond_cum_prob[col] = cum_feature_dict
+    def _get_prior_prob(self, y_train):
+        # prior_prob: dict() key is class, value is the prior probability of this class
+        # class_idx:  dict() key is class, value is a list containing the indices of instances for this class
+        classes, counts = np.unique(y_train, return_counts=True)
+        self.prior_prob = dict(zip(classes, counts/len(y_train)))
+        self.class_idx = {k: np.where(y_train == k)[0].tolist() for k in classes}
+        self.y_cate = pd.Categorical(y_train, categories=np.unique(y_train))
     
     def fit(self, x_train, y_train):
-        x_train = self.discretizer.fit_transform(x_train, y_train)
-        if self.group_cate:
-            x_train = self.grouping.fit(x_train, y_train)
-            
         ncol = np.shape(x_train)[1]
         self.cate_col = list(set(np.arange(ncol)) - set(self.cont_col))
+        self._get_prior_prob(y_train)
+        
+        if len(self.cont_col) > 0:
+            x_train = self.discretizer.fit_transform(x_train, y_train)
+            
         if len(self.cate_col) > 0:
-            x_train[:,self.cate_col] = self.encode.fit(x_train[:,self.cate_col])
+            x_train[:,self.cate_col] = self.encoder.fit(x_train[:,self.cate_col])
         
         self.transform_x_train = x_train
         
-        for value in np.unique(y_train):
-            self.association(self.transform_x_train[y_train == value, :], value)
-        self.get_prior_prob(y_train)
-        
-    def get_prob_dist_single(self, x):
-        y_prob = []
+        for c, idx in self.class_idx.items():
+            self._get_association(self.transform_x_train[idx,:], c)
+    
+    def _get_prob_dist_single(self, x):
+        y_val = []
         for c in self.class_idx.keys():
             prob = self.prior_prob[c]
             for cluster in self.cluster_book[c]:
                 if len(cluster) == 1:
+                    x_col = cluster[0]
                     if cluster[0] in self.cont_col and self.disc_method == "ndd":
-                        total_bins = len(self.cond_prob[cluster[0]][c])
-                        lower_idx = int(np.clip(x[cluster[0]] - 1, 0, total_bins - 2))
-                        upper_idx = int(np.clip(x[cluster[0]] + 1, 2, total_bins - 1))
-                        prob *= sum(list(self.cond_prob[cluster[0]][c].values())[lower_idx:(upper_idx+1)])
+                        total_bins = len(self.cond_prob[x_col][c])
+                        lower_idx = int(np.clip(x[x_col] - 1, 0, total_bins - 1))
+                        upper_idx = int(np.clip(x[x_col] + 1, 1, total_bins))
+                        prob *= sum(list(self.cond_prob[x_col][c].values())[lower_idx:(upper_idx+1)])
                     else:
-                        prob *= self.cond_prob[cluster[0]][c][x[cluster[0]]]
+                        prob *= self.cond_prob[x_col][c][x[x_col]]
                 else:
                     sup_cluster, inf_cluster = [], []
                     for col in cluster:
-                        sup_index = list(self.cond_prob[col][c]).index(x[col])
+                        x_index = list(self.cond_prob[col][c]).index(x[col])
                         item_prob = [0] + list(self.cond_cum_prob[col][c].values())
-                        
+                        total_bins = len(item_prob) - 1
                         if col in self.cont_col and self.disc_method == "ndd":
-                            lower_idx = int(np.clip(sup_index-1, 0, len(item_prob) - 2))
-                            upper_idx = int(np.clip(sup_index+1, 2, len(item_prob)))
+                            lower_idx = int(np.clip(x_index - 1, 0, total_bins - 1))
+                            upper_idx = int(np.clip(x_index + 1, 1, total_bins))
                             inf_cluster.append(item_prob[upper_idx])
                             sup_cluster.append(item_prob[lower_idx])
                         else:
-                            inf_cluster.append(item_prob[sup_index+1])
-                            sup_cluster.append(item_prob[sup_index])
+                            inf_cluster.append(item_prob[x_index+1])
+                            sup_cluster.append(item_prob[x_index])
                     
                     inf = min(inf_cluster)
                     sup = max(sup_cluster)
                     prob *= max(inf - sup, 1e-5)
-            y_prob.append(prob)
+            y_val.append(prob)
+
+        return y_val
+    
+    def _get_cond_prob(self, x_train, x_test):
+        ncol = np.shape(x_train)[1]
+        self.cond_prob = dict() # key is column, value dict: key is class, value is corresponding probabilities
+        self.cond_cum_prob = dict() # key is column, value dict: key is class, value is corresponding cumulative probabilities
+        for col in range(ncol):
+            categories = np.unique(np.append(x_train[:,col], x_test[:,col]))
+            x_cate = pd.Categorical(x_train[:,col], categories=categories)
+            Laplace_tab = pd.crosstab(x_cate, self.y_cate, dropna=False) + self.alpha
+            density_tab = Laplace_tab.apply(lambda x: x/x.sum())
+            self.cond_prob[col] = density_tab.to_dict()
+            self.cond_cum_prob[col] = density_tab.cumsum().to_dict()
         
-        y_prob = np.array(y_prob)/np.sum(y_prob)
-        return y_prob
-    
-    def get_proba(self, x_test):
-        self.get_cond_prob(self.transform_x_train, x_test)
-        y_predict = list()
-        for x in x_test:
-            y_predict.append(self.get_prob_dist_single(x))
-        return np.array(y_predict)
-    
-    def get_transform(self, x_test):
-        x_test = self.discretizer.transform(x_test)
-        if self.group_cate:
-            x_test = self.grouping.transform(x_test)
+    def predict_proba(self, x_test):
+        if len(self.cont_col) > 0:
+            x_test = self.discretizer.transform(x_test)
+        
         if len(self.cate_col) > 0:
-            x_test[:,self.cate_col] = self.encode.transform(x_test[:,self.cate_col])
-        return x_test
+            x_test[:,self.cate_col] = self.encoder.transform(x_test[:, self.cate_col])
+        
+        self.transform_x_test = x_test
+        self._get_cond_prob(self.transform_x_train, self.transform_x_test)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=None) as executor:
+            y_val = [executor.submit(self._get_prob_dist_single, x).result() for x in x_test]
+        return np.array(y_val)/np.sum(y_val, axis=1).reshape(-1, 1)
     
     def predict(self, x_test):
-        self.transform_x_test = self.get_transform(x_test)
+        y_proba = self.predict_proba(x_test)
         class_label = np.array(list(self.class_idx.keys()))
-        return class_label[list(np.argmax(self.get_proba(self.transform_x_test), axis=1))]
-    
-    def predict_proba(self, x_test):
-        self.transform_x_test = self.get_transform(x_test)
-        return self.get_proba(self.transform_x_test)
+        return class_label[list(np.argmax(y_proba, axis=1))]
