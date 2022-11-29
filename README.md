@@ -28,8 +28,7 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 ## CIBer
 
-### init()
-
+> init()
 **_cont_col_**: a list, containing the indices of the continuous variables
 
 **_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "total_order". Four measurements to correlation. The default is "total_order"
@@ -48,19 +47,19 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 **_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails. The default string is "pkid"
 
-## fit()
+> fit()
 
 **_x_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
 
 **_y_train_**: a numpy $n \times 1$ array for the $n$ training (real-valued) labels
 
-## predict()
+> predict()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
 **return**: a numpy $n \times 1$ array for the $n$ predicted class labels
 
-## predict_proba()
+> predict_proba()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
@@ -68,7 +67,7 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 # CIBer_Engineering.py
 
-## Discretization()
+> Discretization()
 
 **_cont_col_**: a list of indices to be discretized
 
@@ -90,17 +89,17 @@ list of alternative discretization methods if mdlp fails except **SCIPY_DIST**
 
 ## Joint_Encoding
 
-### init()
+> init()
 
 **_df_**: a $n \times p$ dataframe for $p$ feature variables of $n$ observations
 
 **_col_index_**: a list, containing the indices of categorical feature variables
 
-### fit()
+> fit()
 
 **_x_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
 
-### transform()
+> transform()
 
 **_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
