@@ -9,7 +9,14 @@ This document mainly explain the important and practical functions in **CIBer.py
 
 # Remarks
 The **MDLP** discretization method has been disabled, since it requires additional package.
+## window users
 1. install visual studio community, and then install C related packages for CPython
+2. type the following line in terminal to install
+> pip install mdlp-discretization
+
+## macos users
+1. type the following line in terminal to install the **Command Line Tools package**
+> xcode-select --install
 2. type the following line in terminal to install
 > pip install mdlp-discretization
 
