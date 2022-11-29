@@ -28,26 +28,25 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 ## CIBer
 
-> init(self, cont_col=[], asso_method='total_order', min_asso=0.8, alpha=1, 
-                 group_cate=False, joint_encode=True, disc_method="auto", n_bins=10, disc_backup="pkid")
+> init(self, cont_col=[], asso_method='kendall', min_asso=0.8, alpha=1, disc_method="mdlp", joint_encode=True, **kwargs)
 
 **_cont_col_**: a list, containing the indices of the continuous variables
 
-**_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "total_order". Four measurements to correlation. The default is "total_order"
+**_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "total_order". Four measurements to correlation. The default is "kendall"
 
 **_min_asso_**: a number between $0,1$ which specifies the threshold of correlation when determining the comonotonic relationship. The default value is 0.8
 
 **_alpha_**: a positive number used in Laplacian smoothing. The default value is 1
 
-**_group_cate_**: a boolean, whether to combine multiple categories with same label into one group. The default value is False
-
 **_joint_encode_**: a boolean, whether to use joint encoding. The default value is True
 
 **_disc_method_**: a string indicating the discretization method adopted for each continuous feature variable. The default string is "auto"
 
-**_n_bins_**: a positive integer for the total number of bins for each discretization. The default value is 10
+**_**kwargs_**: additional keyworded arguments passing to **Discretization()**, below are two acceptable keyworded arguments
 
-**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails. The default string is "pkid"
+**_n_bins_**: a positive integer for the total number of bins for each discretization.
+
+**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails.
 
 > fit(self, x_train, y_train)
 
