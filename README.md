@@ -12,13 +12,13 @@ The **MDLP** discretization method has been disabled, since it requires addition
 ## window users
 1. install visual studio community, and then install [**Microsoft C++ Build Tools**](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for C/C++ related packages
 2. type the following line in terminal to install
-> pip install mdlp-discretization
+> pip install mdlp
 
 ## macos users
 1. type the following line in terminal to install the **Command Line Tools package**
 > xcode-select --install
 2. type the following line in terminal to install
-> pip install mdlp-discretization
+> pip install mdlp
 
 # Data Requirements
 
