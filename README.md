@@ -73,7 +73,7 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 **_cont_col_**: a list of indices to be discretized
 
-**_disc_method_**: (refer to CIBer.py) 
+**_disc_method_**: any string in **DISC_BASE** + **SCIPY_DIST**, (refer to CIBer.py)
 
 list of distributions provided by scipy used in Equal-quantile distribution method, number of bins determined by **_n_bins_**
 > SCIPY_DIST = ["uniform", "norm", "t", "chi2", "expon", "laplace", "skewnorm", "gamma"]
