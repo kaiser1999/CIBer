@@ -53,7 +53,7 @@ class CIBer():
                 s += np.sum(arr)
             return s / (n*(n-1)/2)
         
-    def _get_association(self, x_train, c):
+    def _get_association(self, x_train):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             asso_matrix = pd.DataFrame(data=x_train).corr(method=self.asso_method).to_numpy()
@@ -63,7 +63,7 @@ class CIBer():
                                         distance_threshold=1-self.min_asso, n_clusters=None)
         AGNES.fit(distance_matrix)
         AGNES_clusters = AGNES.labels_
-        self.cluster_book[c] = sorted([np.where(AGNES_clusters == cluster)[0].tolist() for cluster in np.unique(AGNES_clusters)])
+        return sorted([np.where(AGNES_clusters == cluster)[0].tolist() for cluster in np.unique(AGNES_clusters)])
     
     def _get_prior_prob(self, y_train):
         # prior_prob: dict() key is class, value is the prior probability of this class
@@ -87,7 +87,7 @@ class CIBer():
         self.transform_x_train = x_train
         
         for c, idx in self.class_idx.items():
-            self._get_association(self.transform_x_train[idx,:], c)
+            self.cluster_book[c] = self._get_association(self.transform_x_train[idx,:])
     
     def _get_prob_dist_single(self, x):
         y_val = []
