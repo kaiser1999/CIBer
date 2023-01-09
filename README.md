@@ -1,7 +1,6 @@
 # Repository for CIBer
 
-Paper: Comonotone-Independence Bayes classifier (CIBer)
-
+Paper: Comonotone-Independence Bayes classifier (CIBer) \n
 Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, Suresh SETHI, and Sheung Chi Phillip YAM
 
 This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The continuous feature variables are discretized and those categorical ones are encoded via the proposed **Joint Encoding**. 
