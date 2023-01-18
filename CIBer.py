@@ -58,10 +58,10 @@ class CIBer():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             asso_matrix = pd.DataFrame(data=x_train).corr(method=self.asso_method).to_numpy()
         
-        distance_matrix = np.nan_to_num(1 - np.absolute(asso_matrix), nan=1)
+        self.distance_matrix_ = np.nan_to_num(1 - np.absolute(asso_matrix), nan=1)
         AGNES = AgglomerativeClustering(affinity='precomputed', linkage='complete', 
                                         distance_threshold=1-self.min_asso, n_clusters=None)
-        AGNES.fit(distance_matrix)
+        AGNES.fit(self.distance_matrix_)
         AGNES_clusters = AGNES.labels_
         return sorted([np.where(AGNES_clusters == cluster)[0].tolist() for cluster in np.unique(AGNES_clusters)])
     
