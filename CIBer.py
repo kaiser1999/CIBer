@@ -8,11 +8,11 @@ import pickle
 copy_obj = lambda obj: pickle.loads(pickle.dumps(obj))
 
 class CIBer():
-    def __init__(self, cont_col=[], asso_method='kendall', min_asso=0.8, alpha=1, 
-                 disc_method="mdlp", joint_encode=True, **kwargs):
+    def __init__(self, cont_col=[], asso_method='modified', min_asso=0.95, alpha=1, 
+                 disc_method="norm", joint_encode=True, **kwargs):
         self.cont_col = cont_col
-        if asso_method.lower() == "total_order":
-            self.asso_method = self._total_order
+        if asso_method.lower() == "modified":
+            self.asso_method = self._modified
         else:
             self.asso_method = asso_method.lower()
         self.min_asso = min_asso
@@ -25,11 +25,11 @@ class CIBer():
             self.encoder = Frequency_Encoding()
 
         self.cluster_book = dict()
-        assert asso_method.lower() in ["spearman", "pearson", "kendall", "total_order"]
+        assert asso_method.lower() in ["spearman", "pearson", "kendall", "modified"]
         assert min_asso >= 0 and min_asso <= 1
         assert alpha > 0
     
-    def _total_order(self, a, b):
+    def _modified(self, a, b):
         freq_df = pd.DataFrame({"a":a, "b":b}).groupby(['a','b']).size().reset_index(name='count')
         x, y, count = freq_df.T.values
         n = len(a)

@@ -28,19 +28,19 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 ## CIBer
 
-> init(self, cont_col=[], asso_method='kendall', min_asso=0.8, alpha=1, disc_method="mdlp", joint_encode=True, **kwargs)
+> init(self, cont_col=[], asso_method='modified', min_asso=0.95, alpha=1, disc_method="norm", joint_encode=True, **kwargs)
 
 **_cont_col_**: a list, containing the indices of the continuous variables
 
-**_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "total_order". Four measurements to correlation. The default is "kendall"
+**_asso_method_**: a string can be set to "pearson", "spearman", "kendall", "modified". Four measurements to correlation. The default is "modified"
 
-**_min_asso_**: a number between $0,1$ which specifies the threshold of correlation when determining the comonotonic relationship. The default value is 0.8
+**_min_asso_**: a number between $0,1$ which specifies the threshold of correlation when determining the comonotonic relationship. The default value is 0.95
 
 **_alpha_**: a positive number used in Laplacian smoothing. The default value is 1
 
 **_joint_encode_**: a boolean, whether to use joint encoding. The default value is True
 
-**_disc_method_**: a string indicating the discretization method adopted for each continuous feature variable. The default string is "auto"
+**_disc_method_**: a string indicating the discretization method adopted for each continuous feature variable. The default string is "norm" for normal distribution quantile method
 
 **_**kwargs_**: additional keyworded arguments passing to **Discretization()**, below are two acceptable keyworded arguments
 
