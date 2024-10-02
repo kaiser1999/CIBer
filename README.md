@@ -5,30 +5,30 @@ Author: Yongzhao CHEN, Ka Chun CHEUNG, Nok Sang FAN, Suresh SETHI, and Sheung Ch
 
 This is the user guide for Comonotone-Independence Bayesian Classifier (CIBer). CIBer is a supervised learning model which deals with multi-class classification tasks. The continuous feature variables are discretized and those categorical ones are encoded via the proposed **Joint Encoding**. 
 
-This document mainly explain the important and practical functions in **CIBer.py** and **CIBer_Engineering.py**. Lastly, the **CIBer_Bankchurner.py** gives a simple but illuminating example on CIBer with the use of [Bankchurner](https://www.kaggle.com/code/thomaskonstantin/bank-churn-data-exploration-and-churn-prediction/data) dataset by Thomas Konstantin.
+This document mainly explains the important and practical functions in **CIBer.py** and **CIBer_Engineering.py**. Lastly, the **CIBer_Bankchurner.py** gives a simple but illuminating example on CIBer with the use of [Bankchurner](https://www.kaggle.com/code/thomaskonstantin/bank-churn-data-exploration-and-churn-prediction/data) dataset by Thomas Konstantin.
 
 # Remarks
-The **MDLP** discretization method has been disabled, since it requires additional package.
-## window users
+The **MDLP** discretization method has been disabled, since it requires an additional package. Upon successful installation, **_disc_method="mdlp"_** is ready to use
+## Window users
 1. install visual studio community, and then install [**Microsoft C++ Build Tools**](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for C/C++ related packages
 2. type the following line in terminal to install
 > pip install mdlp
 
-## macos users
-1. type the following line in terminal to install the **Command Line Tools package**
+## MacOS users
+1. type the following line in the terminal to install the **Command Line Tools package**
 > xcode-select --install
-2. type the following line in terminal to install
+2. type the following line in the terminal to install
 > pip install mdlp
 
 # Data Requirements
 
-CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please perform some proper data preprocessing beforehand, e.g. removals of outlier and missing observation, and encode all categorical feature variables with numerical values.
+CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please perform some proper data preprocessing beforehand, e.g. removals of outlier and missing observations, and encode all categorical feature variables with numerical values.
 
 # CIBer.py
 
 ## CIBer
 
-> init(self, cont_col=[], asso_method='modified', min_asso=0.95, alpha=1, disc_method="norm", joint_encode=True, **kwargs)
+> init(self, cont_col, asso_method='modified', min_asso=0.95, alpha=1, disc_method="norm", n_jobs=None, \*\*kwargs)
 
 **_cont_col_**: a list, containing the indices of the continuous variables
 
@@ -38,31 +38,33 @@ CIBer deals with multi-class classification tasks with numerical or discrete (bu
 
 **_alpha_**: a positive number used in Laplacian smoothing. The default value is 1
 
-**_joint_encode_**: a boolean, whether to use joint encoding. The default value is True
+**_n_jobs_**: an integer or None, the number of cores used in calculating the association matrix with -1 using all cores. The default value is None for using pandas.DataFrame.corr() instead of parallel computing.
 
-**_disc_method_**: a string indicating the discretization method adopted for each continuous feature variable. The default string is "norm" for normal distribution quantile method
+**_disc_method_**: a string indicating the discretization method adopted for each continuous feature variable. The default string is "norm" for the normal distribution quantile method
 
-**_**kwargs_**: additional keyworded arguments passing to **Discretization()**, below are two acceptable keyworded arguments
+**_\*\*kwargs_**: additional keyworded arguments passing to **Discretization()**, below are two acceptable keyworded arguments
 
-**_n_bins_**: a positive integer for the total number of bins for each discretization.
+**_n_bins_**: a positive integer for the total number of bins for each discretization
 
-**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails.
+**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails
 
-> fit(self, x_train, y_train)
+> fit(self, X_train, y_train, sample_weight=None)
 
-**_x_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
+**_X_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
 
-**_y_train_**: a numpy $n \times 1$ array for the $n$ training (real-valued) labels
+**_y_train_**: a numpy $n$-dimensional array for the $n$ training (real-valued) labels
 
-> predict(self, x_test)
+**_sample_weight_**: a numpy $n$-dimensional array for the $n$ (real-valued) sample weights
 
-**_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+> predict(self, X_test)
 
-**return**: a numpy $n \times 1$ array for the $n$ predicted class labels
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
-> predict_proba(self, x_test)
+**return**: a numpy $n$-dimensional array for the $n$ predicted class labels
 
-**_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+> predict_proba(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
 **return**: a numpy $n \times K$ array for the predicted probabilities of the $K$ classes with $n$ test observations
 
@@ -75,13 +77,115 @@ a Python dictionary where
 > self.distance_matrix_
 a numpy $p \times p$ array, where the $(i,j)$ entry is the corresponding association value computed according to the chosen **_asso_method_** of feature $i$ and feature $j$.
 
+
+## KMeansRegressor
+
+> init(self, clf, K_min=2, K_max=50, n_trials=5, seed=4012, loss="mae", verbose=True)
+
+**_clf_**: a Python class of classifier, which must contain two functions **fit()** and **predict_proba()**
+
+**_K_min_**: a positive integer indicating the start number of clusters K in K-Means clustering. The default value is 2
+
+**_K_max_**: a positive integer indicating the end number of clusters K in K-Means clustering. The default value is 50
+
+**_n_trials_**: a positive integer indicating the number of trails in each K in K-Means clustering. The default value is 5
+
+**_seed_**: a number indicating the random seed used in numpy. The default value is 4012
+
+**_mae_**: a string indicating the loss function either "mae" or "mse". The default value is "mae"
+
+**_verbose_**: a boolean indicating whether to print a progress bar in the console. The default value is True
+
+> fit(self, X_train, y_train, sample_weight=None)
+
+**_X_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
+
+**_y_train_**: a numpy $n$-dimensional array for the $n$ training (real-valued) labels
+
+**_sample_weight_**: a numpy $n$-dimensional array for the $n$ (real-valued) sample weights
+
+> predict(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n$-dimensional array for the $n$ predicted class labels
+
+## AdaBoostCIBer
+
+> init(self, n_CIBer=5, verbose=True, \*\*kwargs)
+
+**_n_CIBer_**: a positive integer indicating the number of CIBer used in AdaBoost. The default value is 5
+
+**_verbose_**: a boolean indicating whether to print a progress bar in the console. The default value is True
+
+**_\*\*kwargs_**: additional keyworded arguments passing to **CIBer()**
+
+> fit(self, X_train, y_train, sample_weight=None)
+
+**_X_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
+
+**_y_train_**: a numpy $n$-dimensional array for the $n$ training (real-valued) labels
+
+**_sample_weight_**: a numpy $n$-dimensional array for the $n$ (real-valued) sample weights
+
+> predict(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n$-dimensional array for the $n$ predicted class labels
+
+> predict_proba(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n \times K$ array for the predicted probabilities of the $K$ classes with $n$ test observations
+
+## GradientBoostClassifier
+
+> init(self, reg, n_reg=100, seed=4012, verbose=True)
+
+**_reg_**: a Python class of regressor, which must contain two functions **fit()** and **predict()**
+
+**_n_reg_**: a positive integer indicating the number of regressors for each label. The default value is 100
+
+**_seed_**: a number indicating the random seed used in numpy. The default value is 4012
+
+**_verbose_**: a boolean indicating whether to print a progress bar in the console. The default value is True
+
+> fit(self, X_train, y_train, sample_weight=None)
+
+**_X_train_**: a numpy $n \times p$ array for the $p$ training (real-valued) feature variables with $n$ training observations
+
+**_y_train_**: a numpy $n$-dimensional array for the $n$ training (real-valued) labels
+
+**_sample_weight_**: a numpy $n$-dimensional array for the $n$ (real-valued) sample weights
+
+> predict(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n$-dimensional array for the $n$ predicted class labels
+
+> predict_proba(self, X_test)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**return**: a numpy $n \times K$ array for the predicted probabilities of the $K$ classes with $n$ test observations
+
+
 # CIBer_Engineering.py
 
-> Discretization(cont_col, disc_method, disc_backup="pkid", n_bins=10)
+> Discretization(cont_col, disc_method, \*\*kwargs)
 
 **_cont_col_**: a list of indices to be discretized
 
 **_disc_method_**: any string in **DISC_BASE** + **SCIPY_DIST**, (refer to CIBer.py)
+
+**_\*\*kwargs_**: additional keyworded arguments passing to a class for discretization method **disc_xxx()**, below are two acceptable keyworded arguments
+
+**_n_bins_**: a positive integer for the total number of bins for each discretization
+
+**_disc_backup_**: a string indicating the discretization method adopted if the method **_disc_method="mdlp"_** fails
 
 list of distributions provided by scipy used in Equal-quantile distribution method, number of bins determined by **_n_bins_**
 > SCIPY_DIST = ["uniform", "norm", "t", "chi2", "expon", "laplace", "skewnorm", "gamma"]
@@ -95,22 +199,38 @@ list of all discretization methods except **SCIPY_DIST**
 list of alternative discretization methods if mdlp fails except **SCIPY_DIST**
 > MDLP_BACKUP = ["equal_length", "auto"] + SIZE_BASE
 
-**return** a class for discretization method
+**return** a class for discretization method **disc_xxx()**
+
+> fit_transform(self, X_train, y_train=None)
+
+**_X_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
+
+**_y_train_**: a $n$-dimensional numpy array for **_disc_method="mdlp"_**, otherwise it is just a dummy variable for completeness
+
+**return**: a numpy $n \times p$ array with the discretized continuous feature variable
+
+> transform(self, X_test, y_test=None)
+
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+
+**_y_train_**: a dummy variable for completeness
+
+**return**: a numpy $n \times p$ array with the discretized continuous feature variable
 
 ## Joint_Encoding
 
-> init(self, df, col_index)
+> fit_transform(self, X_train, y_train=None)
 
-**_df_**: a $n \times p$ dataframe for $p$ feature variables of $n$ observations
+**_X_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
 
-**_col_index_**: a list, containing the indices of categorical feature variables
+**_y_train_**: a dummy variable for completeness
 
-> fit(self, x_train)
+**return**: a numpy $n \times p$ array with the encoded categorical feature variable
 
-**_x_train_**: a $n \times p$ numpy array for the $p$ training feature variables with $n$ training observations
+> transform(self, X_test, y_test=None)
 
-> transform(self, x_test)
+**_X_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
 
-**_x_test_**: a numpy $n \times p$ array for the $p$ test (real-valued) feature variables with $n$ test observations
+**_y_train_**: a dummy variable for completeness
 
 **return**: a numpy $n \times p$ array with the encoded categorical feature variable
