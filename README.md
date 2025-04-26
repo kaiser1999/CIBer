@@ -22,7 +22,7 @@ The **MDLP** discretization method has been disabled, since it requires an addit
 
 # Data Requirements
 
-CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please perform some proper data preprocessing beforehand, e.g. removals of outlier and missing observations, and encode all categorical feature variables with numerical values.
+CIBer deals with multi-class classification tasks with numerical or discrete (but should be ordered) input variables. Before passing the data into the model, please perform some proper data preprocessing beforehand, e.g. removals of outlier and missing observations. Categorical features with string are accepted.
 
 # CIBer.py
 
